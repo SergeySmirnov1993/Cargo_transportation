@@ -1,5 +1,6 @@
 import requests
 import json
+from django.db.models import Q
 
 from transportation import models
 
@@ -20,6 +21,11 @@ def get_not_completed_orders():
     return models.Order.objects.exclude(completed=True)
 
 
+def get_orders_by_places(load_place, unload_place):
+    return models.Order.objects.filter(Q(Q(load_place=load_place) & Q(unload_place=unload_place))
+                                       | Q(Q(load_place=unload_place) & Q(unload_place=load_place)))
+
+
 def get_free_orders():
     return models.Order.objects.filter(transport__in=(None, ''))
 
@@ -28,8 +34,8 @@ def get_truck(truck_id):
     return models.Transport.objects.get(id=truck_id)
 
 
-def get_truck_by_number(reg_number):
-    return models.Transport.objects.get(reg_number=reg_number)
+def get_truck_by_numbers(reg_numbers):
+    return models.Transport.objects.filter(reg_number__in=reg_numbers)
 
 
 def get_all_trucks():
@@ -123,18 +129,27 @@ def orders_calculations(first_location, second_location):
 
 
 def get_truck_for_additional_order(order_id):
-    current_wight = get_order(order_id).weight
-    trucks = get_busy_trucks()
-    reg_num = {}
-    for truck in trucks:
-        residual_weight = truck.carrying - current_wight
-        reg_num[truck.reg_number] = residual_weight
-    orders = get_orders_by_reg_num(reg_num.keys())
-    for order in orders:
-        if order.weight <= reg_num[order.transport]:
-            continue
-        else:
-            del reg_num[order.transport]
-    data = tuple((key, key) for key in reg_num)
-    return data
+    current_order = get_order(order_id)
+    same_dir_orders = get_orders_by_places(current_order.load_place, current_order.unload_place)
+
+    if same_dir_orders:
+        same_dir_rn = {}
+        for order in same_dir_orders:
+            if order.transport in same_dir_rn:
+                same_dir_rn[order.transport] += order.weight
+            else:
+                same_dir_rn[order.transport] = order.weight
+
+        trucks = get_truck_by_numbers(same_dir_rn.keys())
+        reg_num = {}
+
+        for truck in trucks:
+            residual_weight = truck.carrying - current_order.weight - same_dir_rn[truck.reg_number]
+            if residual_weight > 0:
+                reg_num[truck.reg_number] = residual_weight
+
+        data = tuple((key, key) for key in reg_num)
+        return data
+
+    return None
 

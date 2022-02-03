@@ -20,7 +20,9 @@ class Order(forms.Form):
 
 
 class AdditionalOrder(forms.Form):
-    reg_nam = forms.ChoiceField(required=False)
+    trucks_rn = functions.get_busy_reg_num()
+    choices = tuple((key, key) for key in trucks_rn)
+    reg_nam = forms.ChoiceField(label='Автомобиль:', choices=choices, required=False)
 
 
 class Transport(forms.Form):

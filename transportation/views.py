@@ -64,18 +64,21 @@ def add_order(request):
 
 def add_additional_order(request, order_id):
     if request.method == 'GET':
-        order_id = functions.get_order(order_id).id
         suitable_trucks = functions.get_truck_for_additional_order(order_id)
-        form = forms.AdditionalOrder()
-        form.fields['reg_nam'].choices = suitable_trucks
-        context = {'form': form, 'trucks': True if suitable_trucks else False}
+        if suitable_trucks:
+            form = forms.AdditionalOrder()
+            form.fields['reg_nam'].choices = suitable_trucks
+            context = {'form': form, 'trucks': True}
+        else:
+            context = {'trucks': False}
         return render(request, 'add_additional_order.html', context)
 
     elif request.method == 'POST':
         updated_order = functions.get_order(order_id)
         form = forms.AdditionalOrder(request.POST)
-        updated_order.transport = form.cleaned_data['reg_nam']
-        updated_order.save()
+        if form.is_valid():
+            updated_order.transport = form.cleaned_data['reg_nam']
+            updated_order.save()
 
         return redirect('orders')
 
