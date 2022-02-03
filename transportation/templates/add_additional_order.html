@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block body %}
+
+<main class="container container-small w-50 h-50">
+    <div class="container-sm text-center">
+        <form action="" method="post">
+             {% csrf_token %}
+            <label for="team_name">Enter name: </label>
+            <input id="team_name" type="text" name="name_field" value="Default name for team.">
+            <input type="submit" value="OK">
+        </form>
+
+
+        <form action="" method="POST">
+            {% csrf_token %}
+            {% if trucks %}
+            <h3>Список транспорта которому можно добавить заявку в качестве дополнительной:</h3>
+            {{ form|crispy }}
+            <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
+                <button type="submit" class="btn btn-primary">Добавить</button>
+                <a type="button" class="btn btn-secondary" href="{% url 'orders' %}">Вернуться</a>
+            </div>
+            {% else %}
+            <h2>К сожалению транспорт которому можно добавить заявку в качестве дополнительной отсутсвует</h2>
+            <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
+                <a type="button" class="btn btn-secondary" href="{% url 'orders' %}">Вернуться</a>
+            </div>
+            {% endif %}
+        </form>
+    </div>
+</main>
+
+{% endblock %}

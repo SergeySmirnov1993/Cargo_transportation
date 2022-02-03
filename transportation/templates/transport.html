@@ -1,0 +1,62 @@
+{%extends 'base.html'%}
+
+{% block title %}Freight transport{% endblock %}
+{% block body %}
+<div class="row">
+
+  <div class="col">
+    <div class="d-flex flex-column align-items-stretch flex-shrink-0 bg-white">
+    <div class="d-flex align-items-center flex-shrink-0 p-3 text-decoration-none border-bottom">
+      <svg class="bi me-2" width="30" height="24"><use xlink:href="#bootstrap"></use></svg>
+      <span class="fs-5 fw-semibold"><strong class="mb-1">Свободный транспорт:</strong></span>
+    </div>
+    <div class="list-group list-group-flush border-bottom scrollarea">
+      {% for truck in free_transport %}
+      <a href="{% url 'edit-transport' truck_id=truck.id %}" class="list-group-item list-group-item-action py-3 lh-tight" aria-current="true">
+        <div class="d-flex w-100 align-items-center justify-content-between">
+          <strong class="mb-1">{{truck.brand}} {{truck.model}} рег.знак: {{truck.reg_number}}</strong>
+          <small>Грузоподъемность: {{truck.carrying}}</small>
+        </div>
+        <div class="col-10 mb-1 small">
+          Инфо о прицепе водителе и т.п.
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+  </div>
+
+  <div class="col">
+    <div class="d-flex flex-column align-items-stretch flex-shrink-0 bg-white">
+    <div class="d-flex align-items-center flex-shrink-0 p-3 text-decoration-none border-bottom">
+      <svg class="bi me-2" width="30" height="24"><use xlink:href="#bootstrap"></use></svg>
+      <span class="fs-5 fw-semibold"><strong class="mb-1">Транспорт осуществляющий грузоперевозку:</strong></span>
+    </div>
+    <div class="list-group list-group-flush border-bottom scrollarea">
+      {% for truck in busy_transport %}
+      <a href="{% url 'edit-transport' truck_id=truck.id %}" class="list-group-item list-group-item-action py-3 lh-tight" aria-current="true">
+        <div class="d-flex w-100 align-items-center justify-content-between">
+          <strong class="mb-1">{{truck.brand}} {{truck.model}} рег.знак: {{truck.reg_number}}</strong>
+          <small>Грузоподъемность: {{truck.carrying}}</small>
+        </div>
+        <div class="col-10 mb-1 small">
+          Инфо о прицепе водителе и т.п.
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+  </div>
+</div>
+
+<br>
+<div class="row justify-content-md-center">
+  <div class="col-md-auto ">
+    <a class="btn btn-primary" href="{% url 'add-transport' %}">Добавить новое транспортное средство</a>
+  </div>
+</div>
+<br>
+<br>
+<br>
+
+{% endblock %}

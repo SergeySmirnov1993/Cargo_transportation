@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block body %}
+
+<main class="container container-small w-50 h-50">
+    <div class="container-sm text-center">
+        <form method="POST">
+            <h1 class="h3 mb-3 fw-normal">{% if action %}Редактировать заявку: {% else %} Добавить заявку: {% endif %}</h1>
+
+            {% csrf_token %}
+            {{ form|crispy }}
+
+            {% if empty_trucks %}<p class="fw-light"> - На данный момент свободные транспортные средства отсутствуют</p> {% endif %}
+
+            <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
+                <button type="submit" class="btn btn-primary">{% if action %}Сохранить{% else %}Добавить{% endif %}</button>
+                <a type="button" class="btn btn-secondary" href="{% url 'orders' %}">Вернуться</a>
+
+                {% if action %}
+                <div class="btn-group" role="group">
+                    <button id="btnGroupDrop1" type="button" class="btn btn-secondary dropdown-toggle"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                        Другое
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                        <li><a class="dropdown-item" href="{% url 'completed-order' order_id=order_id %}">Отметить как исполненную</a></li>
+                        <li><a class="dropdown-item" href="{% url 'additional-order' order_id=order_id %}">Добавить в качестве дополнительной</a></li>
+                        <li><a class="dropdown-item" href="{% url 'delete-order' order_id=order_id %}">Удалить заявку</a></li>
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- <button class="btn btn-primary mr-1" type="submit">{% if action %}Сохранить{% else %}Добавить{% endif %}</button>
+            {% if action %}
+            <a class="btn btn-success" href="{% url 'completed-order' order_id=order_id %}">Исполнено</a>
+            {% endif %}
+            <a class="btn btn-secondary" href="{% url 'orders' %}">Вернуться</a>
+            {% if action %}
+            <a class="btn btn-danger" href="{% url 'delete-order' order_id=order_id %}">Удалить заявку</a>
+            {% endif %} -->
+        </form>
+    </div>
+</main>
+
+{% endblock %}
