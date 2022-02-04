@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from transportation import forms, models
-from transportation.bl import functions
+from transportation.bl import functions, reports
 
 
 def home_page(request):
@@ -26,8 +26,21 @@ def transport(request):
         return render(request, 'transport.html', context)
 
 
-def reports(request):
-    return render(request, 'reports.html')
+def reports_dash(request, type='empty'):
+    if request.method == 'GET':
+        context = {}
+        if type == 'empty':
+            context['text'] = 'Выберите позицию отчета:'
+        elif type == 'number':
+            data = reports.process_data(reports.number_of_transportation_by_months())
+            context = {'data': data, 'change_tmpl': False}
+        elif type == 'rubles':
+            data = reports.process_data(reports.volume_rubles_by_months())
+            context = {'data': data, 'change_tmpl': False}
+        elif type == 'period':
+            data = reports.distribution_by_directions_for_reporting_period({'year': 2022})
+            context = {'data': data, 'change_tmpl': True}
+        return render(request, 'reports.html', context)
 
 
 def add_order(request):
