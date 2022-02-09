@@ -19,17 +19,16 @@
 {% block header %}
 <header class="p-0 bg-dark text-white">
     <div class="d-flex bd-highlight">
-        <div class="p-2 flex-grow-1 bd-highlight"><h3>Company name</h3></div>
+        <div class="p-2 flex-grow-1 bd-highlight"><h3>{% if user.is_authenticated  %}Hello, {{ user.get_username }}!{% endif %}</h3></div>
         <div class="p-2 bd-highlight">
-            <form class="col-12 col-lg-auto mb-lg-0 me-lg-3">
-                <input type="search" class="form-control" placeholder="Search..." aria-label="Search">
-            </form>
         </div>
         <div class="p-2 bd-highlight">
             <div class="dropdown text-end">
                 <a href="#" class="d-block link-light text-decoration-none dropdown-toggle" id="dropdownUser1"
                    data-bs-toggle="dropdown" aria-expanded="false">
-                    <img src="https://github.com/mdo.png" alt="mdo" width="32" height="32" class="rounded-circle">
+                    {% if user.is_authenticated  %}
+                    <img src="https://github.com/mdo.png" alt="mdo" width="42" height="42" class="rounded-circle">
+                    {% endif %}
                 </a>
                 <ul class="dropdown-menu text-small" aria-labelledby="dropdownUser1" style="">
                     {% if not user.is_authenticated %}
@@ -50,6 +49,7 @@
 
 <div class="container-fluid">
     <div class="row">
+
         <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
             <div class="position-sticky pt-3">
                 <ul class="nav flex-column">
@@ -122,16 +122,14 @@
                         </a>
                     </li>
                 </ul>
-
-            {% block reports %}
-            {% endblock %}
-
             </div>
         </nav>
 
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 bg-dark.bg-gradient">
-            {% block body %}
+            <div  class="min-vh-100">
+                {% block body %}
             {% endblock %}
+            </div>
         </main>
     </div>
 </div>

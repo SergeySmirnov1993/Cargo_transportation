@@ -7,7 +7,12 @@ from transportation.bl import functions, reports
 
 
 def home_page(request):
-    return render(request, 'home_page.html')
+    context = {}
+    date_time_now = functions.current_datetime()
+    exchange_data = functions.exchange_rate()
+    context['exchange_data'] = exchange_data
+    context['date_time_now'] = date_time_now
+    return render(request, 'home_page.html', context)
 
 
 @login_required

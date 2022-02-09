@@ -2,8 +2,8 @@
 
 {% block title %}Cargo transportation{% endblock %}
 {% block body %}
-<br>
-<div class="container-fluid">
+{% if user.is_authenticated  %}
+<!-- <div class="container-fluid">
     <div class="row gy-5">
         <div class="col-12">
 
@@ -45,7 +45,8 @@
 
         </div>
         <div class="col-12">
-            <!-- Jumbotron -->
+
+
             <div
                     class="bg-image p-5 text-center shadow-1-strong rounded mb-5 text-white"
                     style="background-image: url('https://mdbcdn.b-cdn.net/img/new/slides/003.webp');"
@@ -58,7 +59,8 @@
                     neque maiores dolorem unde? Aut dolorum quod excepturi fugit.
                 </p>
             </div>
-            <!-- Jumbotron -->
+
+
         </div>
         <div class="col-6">
             <h1 class="mb-3 h2">Jumbotron</h1>
@@ -79,5 +81,133 @@
             </p>
         </div>
     </div>
+</div> -->
+
+<div class="row">
+    <div class="col-md-3">
+        <br>
+        <div class="badge bg-secondary text-wrap">
+            Текущая дата: {{date_time_now}}
+        </div>
+        <br>
+        <br>
+        <div id="ml_17d8bed2">
+            <div style="padding:0;margin:0;" id="ml_17d8bed2_i" v='1.1'
+                 a='{"t":"g7","lang":"ru","ids":["1327"],"a_br_c":"#546E7A","a_n_bg":"#FFFFFF","a_n_c":"#000000","a_itm_bg":"#546E7A","a_itm_c":"#FFFFFF"}'></div>
+            <div id="ml_17d8bed2_c" style="padding:0;margin:0;padding:7px 5px;"><img
+                    src="https://meteolabs.by/assets/img/logo_z_b.svg"
+                    style="width:15px;opacity:0.7;margin-right:5px;position:relative;top:1px;display:inline-block;"><a
+                    href="https://meteolabs.by/погода_минск/неделя/"
+                    style="color:grey;font-size:12px;text-decoration:none;" target="_blank" id="ml_17d8bed2_u">Погода на
+                неделю</a></div>
+        </div>
+        <script async src="https://app.meteolabs.by/js/?id=ml_17d8bed2"></script>
+    </div>
+    <div class="col-md-5">
+        <img src="https://images.ru.prom.st/567734690_567734690.jpg?PIMAGE_ID=567734690" class="img-fluid">
+    </div>
+    <div class="col-md-4"><br>
+        <div class="row">
+            <table class="table table-info">
+                <thead>
+                <tr>
+                    <th scope="col">№</th>
+                    <th scope="col">Курсы валют на сегодня:</th>
+                    <th scope="col">BYR</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <th scope="row">1</th>
+                    <td>{{exchange_data.USD.1}} USD</td>
+                    <td>{{exchange_data.USD.0}}</td>
+                </tr>
+                <tr>
+                    <th scope="row">2</th>
+                    <td>{{exchange_data.EUR.1}} EUR</td>
+                    <td>{{exchange_data.USD.0}}</td>
+                </tr>
+                <tr>
+                    <th scope="row">3</th>
+                    <td>{{exchange_data.EUR.1}} RUB</td>
+                    <td>{{exchange_data.EUR.0}}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="row">
+            <br>
+            <img src="https://minsk.gov.by/images/org/8643/20220112-egr.jpg" class="img-fluid">
+            <p>Получение информаиции о субъекте хозяйствования из ЕГР Республики Беларусь:</p>
+        </div>
+
+
+    </div>
 </div>
+<div class="row">
+    <div class="col-fluid text-center">
+        <br>
+        <br>
+        <br>
+        <div class="row">
+            <div class="col-lg-4">
+                <img class="rounded-circle"
+                     src="https://egr.gov.by/egrn/images/456.png"
+                     alt="Generic placeholder image" width="140" height="140">
+                <h2>Информация из ЕГР Республики Беларусь</h2>
+                <p>Donec sed odio dui. Etiam porta sem malesuada magna mollis euismod. Nullam id dolor id nibh ultricies
+                    vehicula ut id elit. Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Praesent commodo
+                    cursus magna.</p>
+                <p><a class="btn btn-secondary" href="#" role="button">Просмотреть детали »</a></p>
+            </div><!-- /.col-lg-4 -->
+            <div class="col-lg-4">
+                <img class="rounded-circle"
+                     src="https://komplemir.by/templates/corporate/site/img/buttom_calculation.png"
+                     alt="Generic placeholder image" width="140" height="140">
+                <h2>Расчет времени и стоимости доставки</h2>
+                <p>Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Cras
+                    mattis consectetur purus sit amet fermentum. Fusce dapibus, tellus ac cursus commodo, tortor mauris
+                    condimentum nibh.</p>
+                <p><a class="btn btn-secondary" href="#" role="button">Просмотреть детали »</a></p>
+            </div><!-- /.col-lg-4 -->
+            <div class="col-lg-4">
+                <img class="rounded-circle"
+                     src="https://manjur-express.ru/uploads/images/bimages/1603462626.png"
+                     alt="Generic placeholder image" width="140" height="140">
+                <h2>Отслеживание свободного транспорта и грузов</h2>
+                <p>Donec sed odio dui. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Vestibulum id ligula
+                    porta felis euismod semper. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh,
+                    ut fermentum massa justo sit amet risus.</p>
+                <p><a class="btn btn-secondary" href="#" role="button">Просмотреть детали »</a></p>
+            </div><!-- /.col-lg-4 -->
+        </div>
+        <br>
+        <br>
+    </div>
+</div>
+
+{% else %}
+<div class="d-flex justify-content-center">
+    <br>
+    <br>
+    <br>
+    <br>
+</div>
+<div class="d-flex justify-content-center">
+    <img src="https://translogist.su/7_dorog_sem_dorog.png" class="img-fluid">
+</div>
+<div class="d-flex justify-content-center">
+    <br>
+    <br>
+    <h1 class="h3 mb-3 font-weight-normal">Пожалуйсто войдите в учетную запись</h1>
+</div>
+<div class="d-flex justify-content-center">
+
+    <p>Если Вы не располагаете сведениями для входа обратитесь к администратору</p>
+</div>
+<div class="d-flex justify-content-center">
+    <a class="btn btn-primary" href="{% url 'login'%}?next={{request.path}}">Войти</a>
+</div>
+{% endif %}
+
 {% endblock %}

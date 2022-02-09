@@ -1,13 +1,22 @@
 import requests
 import json
+import locale
+import pytz
+
+from datetime import datetime
 from django.db.models import Q
 
 from transportation import models
 
 OSRM_SEARCH = 'https://nominatim.openstreetmap.org/search?city={}&format=json&polygon=1&addressdetails=1&type=administrative'
 OSRM_ROUTE = 'https://router.project-osrm.org/route/v1/driving/{}?overview=false'
-KM_PRICE = 30
+NB_API = 'https://www.nbrb.by/api/exrates/rates?periodicity=0'
+# USD_API = 'https://www.nbrb.by/api/exrates/rates/431?periodicity=0'
+# RUB_API = 'https://www.nbrb.by/api/exrates/rates/456?periodicity=0'
+# EUR_API = 'https://www.nbrb.by/api/exrates/rates/451?periodicity=0'
 
+KM_PRICE = 30
+locale.setlocale(locale.LC_ALL, "")
 
 def get_order(order_id):
     return models.Order.objects.get(id=order_id)
@@ -119,6 +128,28 @@ def get_distance_data(*args):
     return distance, duration
 
 
+def exchange_rate():
+    response = requests.get(NB_API)
+    data = json.loads(response.content)
+    new_data = {}
+    count = 0
+    for val in data:
+        if count == 3:
+            break
+        if val["Cur_ID"] == 431:
+            new_data['USD'] = (val["Cur_OfficialRate"], val["Cur_Scale"])
+            count += 1
+        elif val["Cur_ID"] == 451:
+            new_data['EUR'] = (val["Cur_OfficialRate"], val["Cur_Scale"])
+            count += 1
+        elif val["Cur_ID"] == 456:
+            new_data['RUB'] = (val["Cur_OfficialRate"], val["Cur_Scale"])
+            count += 1
+    return new_data
+
+
+
+
 def orders_calculations(first_location, second_location):
     first_points = get_coordinates(first_location)
     second_points = get_coordinates(second_location)
@@ -152,4 +183,11 @@ def get_truck_for_additional_order(order_id):
         return data
 
     return None
+
+
+def current_datetime():
+    tz = pytz.timezone('Europe/Minsk')
+    now = datetime.now(tz)
+    format_datetime = now.strftime("%d %B %Y (%A)")
+    return format_datetime
 
