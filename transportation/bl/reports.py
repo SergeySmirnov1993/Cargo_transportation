@@ -51,6 +51,41 @@ def process_data(data):
     return table
 
 
+def process_data_for_charts(data):
+    table = []
+    years = [str(key) for key in sorted(data.keys())]
+    title_row = ['Месяц'] + years
+    table.append(title_row)
+    jan = ['Январь']
+    feb = ['Февраль']
+    mar = ['Март']
+    apr = ['Аперель']
+    may = ['Май']
+    jun = ['Июнь']
+    jul = ['Июль']
+    aug = ['Август']
+    sep = ['Сентябрь']
+    oct = ['Октябрь']
+    nov = ['Ноябрь']
+    dec = ['Декабрь']
+    for year in years:
+        months_data = data[int(year)]
+        jan.append(months_data.get(1, 0))
+        feb.append(months_data.get(2, 0))
+        mar.append(months_data.get(3, 0))
+        apr.append(months_data.get(4, 0))
+        may.append(months_data.get(5, 0))
+        jun.append(months_data.get(6, 0))
+        jul.append(months_data.get(7, 0))
+        aug.append(months_data.get(8, 0))
+        sep.append(months_data.get(9, 0))
+        oct.append(months_data.get(10, 0))
+        nov.append(months_data.get(11, 0))
+        dec.append(months_data.get(12, 0))
+    table.extend([jan, feb, mar, apr, may, jun, jul, aug, sep, oct, nov, dec])
+    return table
+
+
 def get_orders_per_month(month, year):
     return models.Order.objects.filter(Q(created_date__month=month) & Q(created_date__year=year))
 
@@ -74,7 +109,7 @@ def get_orders_per_quarter(quarter, year):
     return models.Order.objects.filter(Q(created_date__month__gte=val[0]) & Q(created_date__month__lte=val[1]) & Q(created_date__year=year))
 
 
-def distribution_by_directions_for_reporting_period(period):
+def distribution_by_directions(period):
     orders = ''
     if YEAR in period:
         year = period[YEAR]
@@ -95,19 +130,6 @@ def distribution_by_directions_for_reporting_period(period):
         else:
             data[f'{oder.load_place}-{oder.unload_place}'] = 1
 
+    data = [[key, val] for key, val in data.items()]
+
     return data
-
-
-print(number_of_transportation_by_months())
-print(process_data(number_of_transportation_by_months()))
-print(volume_rubles_by_months())
-
-
-# data = {'year': 2021}
-# data1 = {'month': (1, 2022)}
-# data2 = {'quarter': (1, 2021)}
-# print([orders.created_date for orders in distribution_by_directions_for_reporting_period(data)])
-# print('---')
-# print([orders.created_date for orders in distribution_by_directions_for_reporting_period(data1)])
-# print('---')
-# print([orders.created_date for orders in distribution_by_directions_for_reporting_period(data2)])

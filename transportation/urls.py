@@ -17,4 +17,5 @@ urlpatterns = [
     path('delete-truck/<int:truck_id>', views.delete_truck, name='delete-truck'),
     path('completed-order/<int:order_id>', views.completed_order, name='completed-order'),
     path('add-additional-order/<int:order_id>', views.add_additional_order, name='additional-order'),
+    path('charts', views.charts, name='charts'),
 ]

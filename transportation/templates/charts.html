@@ -1,0 +1,56 @@
+{%extends 'base.html'%}
+
+{% block title %}Charts{% endblock %}
+{% block links %}
+<script src="https://www.google.com/jsapi"></script>
+  <script>
+   google.load("visualization", "1", {packages:["corechart"]});
+   google.setOnLoadCallback(drawChart);
+   function drawChart() {
+    var data = google.visualization.arrayToDataTable({{period_data|safe}});
+    var options = {
+     title: 'Распределение по направлениям',
+     is3D: true,
+     pieResidueSliceLabel: 'Остальное'
+    };
+    var chart = new google.visualization.PieChart(document.getElementById('dir'));
+     chart.draw(data, options);
+   }
+  </script>
+
+<script>
+   google.load("visualization", "1", {packages:["corechart"]});
+   google.setOnLoadCallback(drawChart);
+   function drawChart() {
+    var data = google.visualization.arrayToDataTable({{proc_num_data|safe}});
+    var options = {
+     title: 'Количество грузоперевозок',
+     hAxis: {title: 'Месяц'},
+     vAxis: {title: 'Кол-во'}
+    };
+    var chart = new google.visualization.ColumnChart(document.getElementById('num'));
+    chart.draw(data, options);
+   }
+ </script>
+
+<script>
+   google.load("visualization", "1", {packages:["corechart"]});
+   google.setOnLoadCallback(drawChart);
+   function drawChart() {
+    var data = google.visualization.arrayToDataTable({{proc_rub_data|safe}});
+    var options = {
+     title: 'Объем грузоперевозок в рублях',
+     hAxis: {title: 'Месяц'},
+     vAxis: {title: 'Объем'}
+    };
+    var chart = new google.visualization.ColumnChart(document.getElementById('rub'));
+    chart.draw(data, options);
+   }
+ </script>
+{% endblock %}
+
+{% block body %}
+  <div id="dir" style="height: 600px;"></div>
+  <div id="num" style="height: 600px;"></div>
+  <div id="rub" style="height: 600px;"></div>
+{% endblock %}

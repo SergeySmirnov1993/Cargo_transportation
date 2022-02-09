@@ -1,5 +1,8 @@
 from django import forms
+from django.core.validators import MinValueValidator, MaxValueValidator
+
 from transportation.bl import functions
+from datetime import datetime as dt
 
 
 class LoginForm(forms.Form):
@@ -30,3 +33,9 @@ class Transport(forms.Form):
     brand = forms.CharField(label='Марка:', max_length=30)
     model = forms.CharField(label='Модель:', max_length=30)
     carrying = forms.FloatField(label='Грузоподъемность:')
+
+
+class Period(forms.Form):
+    month = forms.IntegerField(label='', required=False, min_value=1, max_value=12, widget=forms.NumberInput(attrs={'placeholder': 'Месяц'}))
+    quarter = forms.IntegerField(label='', min_value=1, max_value=4, required=False, widget=forms.NumberInput(attrs={'placeholder': 'Квартал'}))
+    year = forms.IntegerField(label='', min_value=2021, max_value=dt.now().year, required=False, widget=forms.NumberInput(attrs={'placeholder': 'Год'}))

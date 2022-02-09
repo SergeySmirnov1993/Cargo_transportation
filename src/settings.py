@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-@uxpkyidmjklvmi1()3rj_tkpfmdr1wq00@3519rh7d#8cs+dx
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['192.168.100.106', '127.0.0.1']
 
 
 # Application definition
@@ -131,3 +131,9 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Redirect to home URL after login (Default redirects to /accounts/profile/)
+LOGIN_REDIRECT_URL = '/'
+
+# Отображение всез отосланных писем на консоль
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

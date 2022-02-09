@@ -1,10 +1,10 @@
 {%extends 'base.html'%}
+{% load crispy_forms_tags %}
 
 {% block title %}Reports{% endblock %}
 
 {% block reports %}
 {% endblock %}
-
 
 {% block body %}
 {% if text %}
@@ -126,17 +126,129 @@
             </h6>
         </div>
         <div class="col"></div>
-        <div class="col"></div>
+        <div class="col"><a type="button" class="btn btn-secondary" href="{% url 'reports' %}">Вернуться</a></div>
         <div class="col"></div>
     </div>
 </div>
 {% endif %}
 
 {% if change_tmpl and data  %}
+
 <div class="container text-center">
     <br>
     <br>
-    <h1 class="display-6">Отчетный период: 12.11.2021</h1>
+    <h3>Выбрать отчетный период:</h3>
+    <p class="text-justify">- Выберите период и введите данные для отображения отчета</p>
+    <div class="btn-group">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#Month"
+                data-bs-whatever="@mdo">За месяц
+        </button>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#Quarter"
+                data-bs-whatever="@fat">За квартал
+        </button>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#Year"
+                data-bs-whatever="@getbootstrap">За год
+        </button>
+    </div>
+</div>
+
+<div class="modal fade" id="Month" tabindex="-1" aria-labelledby="MonthLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="MonthLabel">Введите данные:</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        {{ form.month|as_crispy_field }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.year|as_crispy_field }}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Вернуться</button>
+                        <button type="submit" class="btn btn-primary">Выбрать</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="Quarter" tabindex="-1" aria-labelledby="MonthLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="QuarterLabel">Введите данные:</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        {{ form.quarter|as_crispy_field }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.year|as_crispy_field }}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Вернуться</button>
+                        <button type="submit" class="btn btn-primary">Выбрать</button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="Year" tabindex="-1" aria-labelledby="MonthLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="YearLabel">Введите данные:</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        {{ form.year|as_crispy_field }}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Вернуться</button>
+                        <button type="submit" class="btn btn-primary">Выбрать</button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="container text-center">
+    <br>
+    <br>
+    <div class="row">
+        <div class="col">
+        </div>
+        <div class="col">
+            {% for key, val in period_info.items %}
+            {% if key == 'month' %}
+            <h4>Данные за {{val.0}} месяц {{val.1}} года: </h4>
+            {% elif key == 'quarter' %}
+            <h4>Данные за {{val.0}} квартал {{val.1}} года: </h4>
+            {% else %}
+            <h4>Данные за {{val}} год: </h4>
+            {%endif%}
+            {%endfor%}
+        </div>
+        <div class="col">
+        </div>
+    </div>
 </div>
 
 <div class="bd-example">
@@ -149,11 +261,11 @@
         </tr>
         </thead>
         <tbody>
-        {% for key, val in data.items %}
+        {% for val in data %}
         <tr>
             <td>{{forloop.counter}}</td>
-            <td>{{key}}</td>
-            <td>{{val}}</td>
+            <td>{{val.0}}</td>
+            <td>{{val.1}}</td>
         </tr>
         {% endfor %}
         </tbody>
@@ -174,7 +286,7 @@
             </h6>
         </div>
         <div class="col"></div>
-        <div class="col"></div>
+        <div class="col"><a type="button" class="btn btn-secondary" href="{% url 'reports' %}">Вернуться</a></div>
         <div class="col"></div>
     </div>
 </div>

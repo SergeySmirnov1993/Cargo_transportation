@@ -1,3 +1,6 @@
+import datetime
+
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from transportation import forms, models
 from transportation.bl import functions, reports
@@ -7,6 +10,7 @@ def home_page(request):
     return render(request, 'home_page.html')
 
 
+@login_required
 def show_orders(request):
     if request.method == 'GET':
         orders = functions.get_not_completed_orders()
@@ -17,6 +21,7 @@ def show_orders(request):
         return render(request, 'orders.html', context)
 
 
+@login_required
 def transport(request):
     if request.method == 'GET':
         free_transport = functions.get_free_trucks()
@@ -26,6 +31,7 @@ def transport(request):
         return render(request, 'transport.html', context)
 
 
+@login_required
 def reports_dash(request, type='empty'):
     if request.method == 'GET':
         context = {}
@@ -38,11 +44,40 @@ def reports_dash(request, type='empty'):
             data = reports.process_data(reports.volume_rubles_by_months())
             context = {'data': data, 'change_tmpl': False}
         elif type == 'period':
-            data = reports.distribution_by_directions_for_reporting_period({'year': 2022})
-            context = {'data': data, 'change_tmpl': True}
+            default_period = {'year': datetime.datetime.now().year}
+            data = reports.distribution_by_directions(default_period)
+            form = forms.Period()
+            context = {'data': data, 'change_tmpl': True, 'form': form, 'period_info': default_period}
         return render(request, 'reports.html', context)
 
+    elif request.method == "POST":
+        form = forms.Period(request.POST)
+        if form.is_valid():
+            month = form.cleaned_data['month']
+            quarter = form.cleaned_data['quarter']
+            year = form.cleaned_data['year']
 
+            form = forms.Period()
+
+            if month and year:
+                period = {'month': (month, year)}
+                data = reports.distribution_by_directions(period)
+                context = {'data': data, 'change_tmpl': True, 'form': form, 'period_info': period}
+
+            elif quarter and year:
+                period = {'quarter': (quarter, year)}
+                data = reports.distribution_by_directions(period)
+                context = {'data': data, 'change_tmpl': True, 'form': form, 'period_info': period}
+
+            elif year and quarter is None and month is None:
+                period = {'year': year}
+                data = reports.distribution_by_directions(period)
+                context = {'data': data, 'change_tmpl': True, 'form': form, 'period_info': period}
+
+            return render(request, 'reports.html', context)
+
+
+@login_required
 def add_order(request):
     if request.method == 'GET':
         add_from = forms.Order()
@@ -75,6 +110,7 @@ def add_order(request):
             return redirect('orders')
 
 
+@login_required
 def add_additional_order(request, order_id):
     if request.method == 'GET':
         suitable_trucks = functions.get_truck_for_additional_order(order_id)
@@ -96,6 +132,7 @@ def add_additional_order(request, order_id):
         return redirect('orders')
 
 
+@login_required
 def edit_order(request, order_id):
     if request.method == 'GET':
         order = functions.get_order(order_id)
@@ -133,6 +170,7 @@ def edit_order(request, order_id):
             return redirect('orders')
 
 
+@login_required
 def completed_order(request, order_id):
     if request.method == 'GET':
         updated_order = functions.get_order(order_id)
@@ -141,6 +179,7 @@ def completed_order(request, order_id):
         return redirect('orders')
 
 
+@login_required
 def delete_order(request, order_id):
     if request.method == 'GET':
         order = functions.get_order(order_id)
@@ -148,6 +187,7 @@ def delete_order(request, order_id):
         return redirect('orders')
 
 
+@login_required
 def add_transport(request):
     if request.method == 'GET':
         add_from = forms.Transport()
@@ -168,6 +208,7 @@ def add_transport(request):
             return redirect('transport')
 
 
+@login_required
 def edit_transport(request, truck_id):
     if request.method == 'GET':
         truck = functions.get_truck(truck_id)
@@ -192,8 +233,22 @@ def edit_transport(request, truck_id):
             return redirect('transport')
 
 
+@login_required
 def delete_truck(request, truck_id):
     if request.method == 'GET':
         truck = functions.get_truck(truck_id)
         truck.delete()
         return redirect('transport')
+
+
+@login_required
+def charts(request):
+    if request.method == 'GET':
+        num_data = reports.number_of_transportation_by_months()
+        proc_num_data = reports.process_data_for_charts(num_data)
+        rub_data = reports.volume_rubles_by_months()
+        proc_rub_data =reports.process_data_for_charts(rub_data)
+        period_data = [['Направление', 'Кол-во']] + reports.distribution_by_directions({'year': 2022})
+        context = {'period_data': period_data, 'proc_num_data': proc_num_data, 'proc_rub_data': proc_rub_data}
+        return render(request, 'charts.html', context)
+
