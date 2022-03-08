@@ -9,8 +9,8 @@ from transportation.bl import functions, reports
 def home_page(request):
     context = {}
     date_time_now = functions.current_datetime()
-    exchange_data = functions.exchange_rate()
-    context['exchange_data'] = exchange_data
+    # exchange_data = functions.exchange_rate()
+    # context['exchange_data'] = exchange_data
     context['date_time_now'] = date_time_now
     return render(request, 'home_page.html', context)
 
@@ -88,6 +88,7 @@ def add_order(request):
         add_from = forms.Order()
         free_rn_choices = functions.get_reg_num_choices()['free_rn_choices']
         add_from.fields['transport'].choices = free_rn_choices
+        add_from.fields['driver'].choices = functions.get_drivers_choices()
         context = {'form': add_from}
         if len(free_rn_choices) == 1:
             context['empty_trucks'] = True
@@ -98,18 +99,40 @@ def add_order(request):
         new_order = models.Order()
 
         if form.is_valid():
-            new_order.load_place = form.cleaned_data['load_place']
-            new_order.unload_place = form.cleaned_data['unload_place']
+            new_order.number = form.cleaned_data['number']
             new_order.cargo = form.cleaned_data['cargo']
             new_order.weight = form.cleaned_data['weight']
-            new_order.transport = form.cleaned_data['transport']
-            new_order.tax = form.cleaned_data['tax']
+            new_order.shipper = form.cleaned_data['shipper']
+            new_order.consignee = form.cleaned_data['consignee']
+            new_order.load_place = form.cleaned_data['load_place']
+            new_order.unload_place = form.cleaned_data['unload_place']
+
             if form.cleaned_data['rates']:
                 new_order.rates = form.cleaned_data['rates']
             else:
                 data = functions.orders_calculations(new_order.load_place, new_order.unload_place)
                 new_order.rates = data[0]
                 new_order.duration = data[1]
+
+            if form.cleaned_data['duration']:
+                new_order.duration = form.cleaned_data['duration']
+
+            new_order.tax = form.cleaned_data['tax']
+
+            if form.cleaned_data['transport']:
+                reg_num = set()
+                reg_num.add(form.cleaned_data['transport'])
+                transport = functions.get_trucks_by_numbers(reg_num)[0]
+                new_order.transport = transport
+
+            if form.cleaned_data['driver']:
+                driver_data = form.cleaned_data['driver'].split()
+                name, surname = driver_data[0], driver_data[1]
+                new_order.driver = functions.get_driver_by_name(name, surname)
+
+            new_order.loading_date = form.cleaned_data['loading_date']
+            new_order.unloading_date = form.cleaned_data['unloading_date']
+            new_order.info = form.cleaned_data['info']
             new_order.save()
 
             return redirect('orders')
@@ -142,17 +165,31 @@ def edit_order(request, order_id):
     if request.method == 'GET':
         order = functions.get_order(order_id)
         edit_form = forms.Order()
+
         free_rn_choices = functions.get_reg_num_choices()['free_rn_choices']
-        curr_truck_choice = ((order.transport, order.transport),) if order.transport else ''
-        choices = free_rn_choices + curr_truck_choice if order.transport else free_rn_choices
-        edit_form.fields['transport'].choices = choices
-        edit_form.fields['transport'].initial = order.transport
-        edit_form.fields['load_place'].initial = order.load_place
-        edit_form.fields['unload_place'].initial = order.unload_place
+        curr_truck_choice = ((order.transport.reg_number, order.transport.reg_number),) if order.transport else ''
+        choices = free_rn_choices + curr_truck_choice if order.transport.reg_number else free_rn_choices
+
+        drivers = functions.get_drivers_choices()
+
+        edit_form.fields['number'].initial = order.number
         edit_form.fields['cargo'].initial = order.cargo
         edit_form.fields['weight'].initial = order.weight
+        edit_form.fields['shipper'].initial = order.shipper
+        edit_form.fields['consignee'].initial = order.consignee
+        edit_form.fields['load_place'].initial = order.load_place
+        edit_form.fields['unload_place'].initial = order.unload_place
         edit_form.fields['rates'].initial = order.rates
         edit_form.fields['tax'].initial = order.tax
+        edit_form.fields['transport'].choices = choices
+        edit_form.fields['transport'].initial = order.transport.reg_number
+        edit_form.fields['driver'].choices = drivers
+        edit_form.fields['driver'].initial = f'{order.driver.name} {order.driver.surname}'
+        edit_form.fields['loading_date'].initial = order.loading_date
+        edit_form.fields['unloading_date'].initial = order.unloading_date
+        edit_form.fields['duration'].initial = order.duration
+        edit_form.fields['info'].initial = order.info
+
         context = {'form': edit_form, 'action': 'edit', 'order_id': order.id}
         if len(free_rn_choices) == 1:
             context['empty_trucks'] = True
@@ -204,9 +241,10 @@ def add_transport(request):
         new_transport = models.Transport()
 
         if form.is_valid():
-            new_transport.reg_number = form.cleaned_data['reg_number']
             new_transport.brand = form.cleaned_data['brand']
             new_transport.model = form.cleaned_data['model']
+            new_transport.release_year = form.cleaned_data['release_year']
+            new_transport.reg_number = form.cleaned_data['reg_number']
             new_transport.carrying = form.cleaned_data['carrying']
             new_transport.save()
 
