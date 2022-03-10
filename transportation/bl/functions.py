@@ -52,6 +52,10 @@ def get_all_trucks():
     return models.Transport.objects.order_by('id').all()
 
 
+def get_all_drivers():
+    return models.Driver.objects.order_by('id').all()
+
+
 def get_free_trucks():
     busy_trucks = get_busy_trucks()
     exclude_vals = set(truck.reg_number for truck in busy_trucks)
@@ -95,6 +99,16 @@ def get_drivers_choices():
     drivers_names.add('')
     choices = tuple((name, name) for name in drivers_names)
     return choices
+
+
+def get_trailer_choices():
+    trailers = models.TruckTrailer.objects.filter(transport=None)
+    choices = tuple((trailer.reg_number, trailer.reg_number) for trailer in trailers)
+    return choices + (('', ''), )
+
+
+def get_trailer_by_number(number):
+    return models.TruckTrailer.objects.filter(reg_number=number).first()
 
 
 def get_driver_by_name(name, surname):
@@ -174,10 +188,8 @@ def get_truck_for_additional_order(order_id):
     if same_dir_orders:
         same_dir_rn = {}
         for order in same_dir_orders:
-            if order.transport in same_dir_rn:
-                same_dir_rn[order.transport] += order.weight
-            else:
-                same_dir_rn[order.transport] = order.weight
+            if order.transport:
+                same_dir_rn[order.transport.reg_number] = order.weight
 
         trucks = get_trucks_by_numbers(same_dir_rn.keys())
         reg_num = {}

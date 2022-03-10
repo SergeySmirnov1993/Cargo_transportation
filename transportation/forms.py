@@ -32,11 +32,14 @@ class AdditionalOrder(forms.Form):
 
 
 class Transport(forms.Form):
+    trailer_choices = functions.get_trailer_choices
     brand = forms.CharField(label='Марка:', max_length=30)
     model = forms.CharField(label='Модель:', max_length=30)
     release_year = forms.IntegerField(label='Год выпуска:')
     reg_number = forms.CharField(label='Регистрационный знак:', max_length=10)
     carrying = forms.FloatField(label='Грузоподъемность:')
+    trailer = forms.ChoiceField(label='Прицеп:', choices=trailer_choices, required=False)
+
 
 
 class Period(forms.Form):
@@ -46,14 +49,12 @@ class Period(forms.Form):
 
 
 class TruckTrailer(forms.Form):
-    transports_choices = functions.get_reg_num_choices()['all_rn_choices']
     brand = forms.CharField(label='Марка:', max_length=30)
     model = forms.CharField(label='Модель:', max_length=30)
     release_year = forms.IntegerField(label='Год выпуска:')
     reg_number = forms.CharField(label='Регистрационный знак:', max_length=10)
     trailer_type = forms.CharField(label='Тип прицепа:', max_length=30)
     carrying = forms.FloatField(label='Грузоподъемность:')
-    transport = forms.ChoiceField(label='Автомобиль:', choices=transports_choices, required=False)
     info = forms.CharField(label='Дополнительная информация', widget=forms.Textarea, required=False)
 
 
