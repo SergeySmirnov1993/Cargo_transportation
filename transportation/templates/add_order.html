@@ -9,9 +9,10 @@
             <h1 class="h3 mb-3 fw-normal">{% if action %}Редактировать заявку: {% else %} Добавить заявку: {% endif %}</h1>
 
             {% csrf_token %}
+            {% if empty_trucks %}<p class="fw-light"> - На данный момент свободные транспортные средства отсутствуют</p> {% endif %}
             {{ form|crispy }}
 
-            {% if empty_trucks %}<p class="fw-light"> - На данный момент свободные транспортные средства отсутствуют</p> {% endif %}
+
 
             <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
                 <button type="submit" class="btn btn-primary">{% if action %}Сохранить{% else %}Добавить{% endif %}</button>
@@ -32,14 +33,6 @@
                 {% endif %}
             </div>
 
-            <!-- <button class="btn btn-primary mr-1" type="submit">{% if action %}Сохранить{% else %}Добавить{% endif %}</button>
-            {% if action %}
-            <a class="btn btn-success" href="{% url 'completed-order' order_id=order_id %}">Исполнено</a>
-            {% endif %}
-            <a class="btn btn-secondary" href="{% url 'orders' %}">Вернуться</a>
-            {% if action %}
-            <a class="btn btn-danger" href="{% url 'delete-order' order_id=order_id %}">Удалить заявку</a>
-            {% endif %} -->
         </form>
     </div>
 </main>
