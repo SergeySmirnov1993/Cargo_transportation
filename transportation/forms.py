@@ -41,7 +41,6 @@ class Transport(forms.Form):
     trailer = forms.ChoiceField(label='Прицеп:', choices=trailer_choices, required=False)
 
 
-
 class Period(forms.Form):
     month = forms.IntegerField(label='', required=False, min_value=1, max_value=12, widget=forms.NumberInput(attrs={'placeholder': 'Месяц'}))
     quarter = forms.IntegerField(label='', min_value=1, max_value=4, required=False, widget=forms.NumberInput(attrs={'placeholder': 'Квартал'}))
@@ -66,4 +65,4 @@ class Driver(forms.Form):
     birth_date = forms.DateField(label='Дата рождения:')
     phone_num = forms.IntegerField(label='Номер телефона:')
     address = forms.CharField(label='Адрес:', max_length=100)
-    transport = forms.ChoiceField(label='Автомобиль:', choices=transports_choices, required=False)
+    transport = forms.MultipleChoiceField(label='Автомобиль:', choices=transports_choices, required=False)

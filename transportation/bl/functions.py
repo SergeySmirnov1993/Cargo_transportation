@@ -56,6 +56,10 @@ def get_all_drivers():
     return models.Driver.objects.order_by('id').all()
 
 
+def get_driver(driver_id):
+    return models.Driver.objects.get(id=driver_id)
+
+
 def get_free_trucks():
     busy_trucks = get_busy_trucks()
     exclude_vals = set(truck.reg_number for truck in busy_trucks)
