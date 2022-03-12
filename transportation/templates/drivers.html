@@ -11,7 +11,7 @@
     </div>
     <div class="list-group list-group-flush border-bottom scrollarea">
       {% for driver in drivers %}
-      <a href="#" class="list-group-item list-group-item-action py-3 lh-tight" aria-current="true">
+      <a href="{% url 'edit-driver' driver_id=driver.id %}" class="list-group-item list-group-item-action py-3 lh-tight" aria-current="true">
         <div class="d-flex w-100 align-items-center justify-content-between">
           <strong class="mb-1">{{driver.name}} {{driver.surname}} {{driver.patronymic}}</strong>
           <small>Мобильный телефон: +375{{driver.phone_num}}</small>
@@ -31,13 +31,34 @@
     </div>
   </div>
 
+<div class="row justify-content-md-center">
+  <div class="container text-center">
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#AddDriver"
+                data-bs-whatever="@mdo">Добавить водителя
+    </button>
+  </div>
+</div>
 
-<form method="post">
-    {% csrf_token %}
-    {{ form|crispy }}
-    <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Вернуться</button>
-        <button type="submit" class="btn btn-primary">Выбрать</button>
+<div class="modal fade" id="AddDriver" tabindex="-1" aria-labelledby="DriverLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="DriverLabel">Введите данные:</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post">
+                    {% csrf_token %}
+                   {{ form|crispy }}
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Вернуться</button>
+                        <button type="submit" class="btn btn-primary">Добавить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
-</form>
+</div>
+
+
 {% endblock %}

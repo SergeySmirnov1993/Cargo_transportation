@@ -56,12 +56,49 @@ def transport(request):
 
 @login_required
 def show_drivers(request):
-    context = {}
-    form = forms.Driver()
-    drivers = functions.get_all_drivers()
-    context['drivers'] = drivers
-    context['form'] = form
-    return render(request, 'drivers.html', context)
+    if request.method == 'GET':
+        context = {}
+        form = forms.Driver()
+        drivers = functions.get_all_drivers()
+        context['drivers'] = drivers
+        context['form'] = form
+        return render(request, 'drivers.html', context)
+
+    elif request.method == 'POST':
+        pass
+
+
+def edit_driver(request, driver_id):
+    if request.method == 'GET':
+        driver = functions.get_driver(driver_id)
+        form = forms.Driver()
+
+        form.fields['name'].initial = driver.name
+        form.fields['surname'].initial = driver.surname
+        form.fields['patronymic'].initial = driver.patronymic
+        form.fields['birth_date'].initial = driver.birth_date
+        form.fields['phone_num'].initial = driver.phone_num
+        form.fields['address'].initial = driver.address
+        form.fields['transport'].initial = driver.transport.all()
+
+        context = {'form': form}
+        return render(request, 'drivers.html', context)
+
+    elif request.method == 'POST':
+        updated_driver = functions.get_order(driver_id)
+        form = forms.Driver(request.POST)
+
+        if form.is_valid():
+            updated_driver.name = form.cleaned_data['name']
+            updated_driver.surname = form.cleaned_data['surname']
+            updated_driver.patronymic = form.cleaned_data['patronymic']
+            updated_driver.birth_date = form.cleaned_data['birth_date']
+            updated_driver.phone_num = form.cleaned_data['phone_num']
+            updated_driver.address = form.cleaned_data['address']
+            updated_driver.transport = form.cleaned_data['transport']
+            updated_driver.save()
+
+            return redirect('drivers')
 
 
 @login_required

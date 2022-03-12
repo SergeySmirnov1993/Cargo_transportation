@@ -8,6 +8,7 @@ urlpatterns = [
     path('orders', views.show_orders, name='orders'),
     path('transport', views.transport, name='transport'),
     path('drivers', views.show_drivers, name='drivers'),
+    path('edit-driver/<int:driver_id>', views.edit_driver, name='edit-driver'),
     path('reports', views.reports_dash, name='reports'),
     path('reports/<type>', views.reports_dash, name='reports'),
     path('add-order', views.add_order, name='add-order'),
