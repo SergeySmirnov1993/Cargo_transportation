@@ -12,6 +12,7 @@ def home_page(request):
     # exchange_data = functions.exchange_rate()
     # context['exchange_data'] = exchange_data
     context['date_time_now'] = date_time_now
+    context['form'] = forms.EgrForm()
     return render(request, 'home_page.html', context)
 
 
@@ -27,7 +28,7 @@ def show_orders(request):
 
 
 @login_required
-def transport(request):
+def show_transport(request):
     if request.method == 'GET':
         trailer_form = forms.TruckTrailer()
         free_transport = functions.get_free_trucks()
@@ -59,92 +60,31 @@ def show_drivers(request):
     if request.method == 'GET':
         context = {}
         form = forms.Driver()
+        transports_choices = functions.get_reg_num_choices()['all_rn_choices']
+        form.fields['transport'].choices = transports_choices
         drivers = functions.get_all_drivers()
         context['drivers'] = drivers
         context['form'] = form
         return render(request, 'drivers.html', context)
 
     elif request.method == 'POST':
-        pass
-
-
-def edit_driver(request, driver_id):
-    if request.method == 'GET':
-        driver = functions.get_driver(driver_id)
-        form = forms.Driver()
-
-        form.fields['name'].initial = driver.name
-        form.fields['surname'].initial = driver.surname
-        form.fields['patronymic'].initial = driver.patronymic
-        form.fields['birth_date'].initial = driver.birth_date
-        form.fields['phone_num'].initial = driver.phone_num
-        form.fields['address'].initial = driver.address
-        form.fields['transport'].initial = driver.transport.all()
-
-        context = {'form': form}
-        return render(request, 'edit_drivers.html', context)
-
-    elif request.method == 'POST':
-        updated_driver = functions.get_order(driver_id)
         form = forms.Driver(request.POST)
+        new_driver = models.Driver()
 
         if form.is_valid():
-            updated_driver.name = form.cleaned_data['name']
-            updated_driver.surname = form.cleaned_data['surname']
-            updated_driver.patronymic = form.cleaned_data['patronymic']
-            updated_driver.birth_date = form.cleaned_data['birth_date']
-            updated_driver.phone_num = form.cleaned_data['phone_num']
-            updated_driver.address = form.cleaned_data['address']
-            updated_driver.transport = form.cleaned_data['transport']
-            updated_driver.save()
+            new_driver.name = form.cleaned_data['name']
+            new_driver.surname = form.cleaned_data['surname']
+            new_driver.patronymic = form.cleaned_data['patronymic']
+            new_driver.birth_date = form.cleaned_data['birth_date']
+            new_driver.phone_num = form.cleaned_data['phone_num']
+            new_driver.address = form.cleaned_data['address']
+            new_driver.save()
+            if form.cleaned_data['transport']:
+                trucks = functions.get_trucks_by_numbers(form.cleaned_data['transport'])
+                for truck in trucks:
+                    new_driver.transport.add(truck)
 
             return redirect('drivers')
-
-
-@login_required
-def reports_dash(request, type='empty'):
-    if request.method == 'GET':
-        context = {}
-        if type == 'empty':
-            context['text'] = 'Выберите позицию отчета:'
-        elif type == 'number':
-            data = reports.process_data(reports.number_of_transportation_by_months())
-            context = {'data': data, 'change_tmpl': False}
-        elif type == 'rubles':
-            data = reports.process_data(reports.volume_rubles_by_months())
-            context = {'data': data, 'change_tmpl': False}
-        elif type == 'period':
-            default_period = {'year': datetime.datetime.now().year}
-            data = reports.distribution_by_directions(default_period)
-            form = forms.Period()
-            context = {'data': data, 'change_tmpl': True, 'form': form, 'period_info': default_period}
-        return render(request, 'reports.html', context)
-
-    elif request.method == "POST":
-        form = forms.Period(request.POST)
-        if form.is_valid():
-            month = form.cleaned_data['month']
-            quarter = form.cleaned_data['quarter']
-            year = form.cleaned_data['year']
-
-            form = forms.Period()
-
-            if month and year:
-                period = {'month': (month, year)}
-                data = reports.distribution_by_directions(period)
-                context = {'data': data, 'change_tmpl': True, 'form': form, 'period_info': period}
-
-            elif quarter and year:
-                period = {'quarter': (quarter, year)}
-                data = reports.distribution_by_directions(period)
-                context = {'data': data, 'change_tmpl': True, 'form': form, 'period_info': period}
-
-            elif year and quarter is None and month is None:
-                period = {'year': year}
-                data = reports.distribution_by_directions(period)
-                context = {'data': data, 'change_tmpl': True, 'form': form, 'period_info': period}
-
-            return render(request, 'reports.html', context)
 
 
 @login_required
@@ -201,6 +141,33 @@ def add_order(request):
             new_order.save()
 
             return redirect('orders')
+
+
+@login_required
+def add_transport(request):
+    if request.method == 'GET':
+        add_from = forms.Transport()
+        context = {'form': add_from}
+        return render(request, 'add_transport.html', context)
+
+    elif request.method == 'POST':
+        form = forms.Transport(request.POST)
+        new_transport = models.Transport()
+
+        if form.is_valid():
+            new_transport.brand = form.cleaned_data['brand']
+            new_transport.model = form.cleaned_data['model']
+            new_transport.release_year = form.cleaned_data['release_year']
+            new_transport.reg_number = form.cleaned_data['reg_number']
+            new_transport.carrying = form.cleaned_data['carrying']
+            if form.cleaned_data['trailer']:
+                trailer = functions.get_trailer_by_number(form.cleaned_data['trailer'])
+                new_transport.trailer = trailer
+            else:
+                new_transport.trailer = None
+            new_transport.save()
+
+            return redirect('transport')
 
 
 @login_required
@@ -308,50 +275,6 @@ def edit_order(request, order_id):
 
 
 @login_required
-def completed_order(request, order_id):
-    if request.method == 'GET':
-        updated_order = functions.get_order(order_id)
-        updated_order.completed = True
-        updated_order.save()
-        return redirect('orders')
-
-
-@login_required
-def delete_order(request, order_id):
-    if request.method == 'GET':
-        order = functions.get_order(order_id)
-        order.delete()
-        return redirect('orders')
-
-
-@login_required
-def add_transport(request):
-    if request.method == 'GET':
-        add_from = forms.Transport()
-        context = {'form': add_from}
-        return render(request, 'add_transport.html', context)
-
-    elif request.method == 'POST':
-        form = forms.Transport(request.POST)
-        new_transport = models.Transport()
-
-        if form.is_valid():
-            new_transport.brand = form.cleaned_data['brand']
-            new_transport.model = form.cleaned_data['model']
-            new_transport.release_year = form.cleaned_data['release_year']
-            new_transport.reg_number = form.cleaned_data['reg_number']
-            new_transport.carrying = form.cleaned_data['carrying']
-            if form.cleaned_data['trailer']:
-                trailer = functions.get_trailer_by_number(form.cleaned_data['trailer'])
-                new_transport.trailer = trailer
-            else:
-                new_transport.trailer = None
-            new_transport.save()
-
-            return redirect('transport')
-
-
-@login_required
 def edit_transport(request, truck_id):
     if request.method == 'GET':
         choices = functions.get_trailer_choices()
@@ -390,11 +313,74 @@ def edit_transport(request, truck_id):
 
 
 @login_required
+def edit_driver(request, driver_id):
+    if request.method == 'GET':
+        driver = functions.get_driver(driver_id)
+        form = forms.Driver()
+
+        form.fields['name'].initial = driver.name
+        form.fields['surname'].initial = driver.surname
+        form.fields['patronymic'].initial = driver.patronymic
+        form.fields['birth_date'].initial = driver.birth_date
+        form.fields['phone_num'].initial = driver.phone_num
+        form.fields['address'].initial = driver.address
+        form.fields['transport'].initial = driver.transport.all()
+
+        context = {'form': form, 'driver': driver}
+        return render(request, 'edit_drivers.html', context)
+
+    elif request.method == 'POST':
+        updated_driver = functions.get_driver(driver_id)
+        form = forms.Driver(request.POST)
+
+        if form.is_valid():
+            updated_driver.name = form.cleaned_data['name']
+            updated_driver.surname = form.cleaned_data['surname']
+            updated_driver.patronymic = form.cleaned_data['patronymic']
+            updated_driver.birth_date = form.cleaned_data['birth_date']
+            updated_driver.phone_num = form.cleaned_data['phone_num']
+            updated_driver.address = form.cleaned_data['address']
+            updated_driver.save()
+            if form.cleaned_data['transport']:
+                trucks = functions.get_trucks_by_numbers(form.cleaned_data['transport'])
+                updated_driver.transport.clear()
+                for truck in trucks:
+                    updated_driver.transport.add(truck)
+
+            return redirect('drivers')
+
+
+@login_required
+def completed_order(request, order_id):
+    if request.method == 'GET':
+        updated_order = functions.get_order(order_id)
+        updated_order.completed = True
+        updated_order.save()
+        return redirect('orders')
+
+
+@login_required
+def delete_order(request, order_id):
+    if request.method == 'GET':
+        order = functions.get_order(order_id)
+        order.delete()
+        return redirect('orders')
+
+
+@login_required
 def delete_truck(request, truck_id):
     if request.method == 'GET':
         truck = functions.get_truck(truck_id)
         truck.delete()
         return redirect('transport')
+
+
+@login_required
+def delete_driver(request, driver_id):
+    if request.method == 'GET':
+        driver = functions.get_driver(driver_id)
+        driver.delete()
+        return redirect('drivers')
 
 
 @login_required
@@ -408,3 +394,48 @@ def charts(request):
         context = {'period_data': period_data, 'proc_num_data': proc_num_data, 'proc_rub_data': proc_rub_data}
         return render(request, 'charts.html', context)
 
+
+@login_required
+def reports_dash(request, type='empty'):
+    if request.method == 'GET':
+        context = {}
+        if type == 'empty':
+            context['text'] = 'Выберите позицию отчета:'
+        elif type == 'number':
+            data = reports.process_data(reports.number_of_transportation_by_months())
+            context = {'data': data, 'change_tmpl': False}
+        elif type == 'rubles':
+            data = reports.process_data(reports.volume_rubles_by_months())
+            context = {'data': data, 'change_tmpl': False}
+        elif type == 'period':
+            default_period = {'year': datetime.datetime.now().year}
+            data = reports.distribution_by_directions(default_period)
+            form = forms.Period()
+            context = {'data': data, 'change_tmpl': True, 'form': form, 'period_info': default_period}
+        return render(request, 'reports.html', context)
+
+    elif request.method == "POST":
+        form = forms.Period(request.POST)
+        if form.is_valid():
+            month = form.cleaned_data['month']
+            quarter = form.cleaned_data['quarter']
+            year = form.cleaned_data['year']
+
+            form = forms.Period()
+
+            if month and year:
+                period = {'month': (month, year)}
+                data = reports.distribution_by_directions(period)
+                context = {'data': data, 'change_tmpl': True, 'form': form, 'period_info': period}
+
+            elif quarter and year:
+                period = {'quarter': (quarter, year)}
+                data = reports.distribution_by_directions(period)
+                context = {'data': data, 'change_tmpl': True, 'form': form, 'period_info': period}
+
+            elif year and quarter is None and month is None:
+                period = {'year': year}
+                data = reports.distribution_by_directions(period)
+                context = {'data': data, 'change_tmpl': True, 'form': form, 'period_info': period}
+
+            return render(request, 'reports.html', context)

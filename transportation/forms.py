@@ -66,3 +66,7 @@ class Driver(forms.Form):
     phone_num = forms.IntegerField(label='Номер телефона:')
     address = forms.CharField(label='Адрес:', max_length=100)
     transport = forms.MultipleChoiceField(label='Автомобиль:', choices=transports_choices, required=False)
+
+
+class EgrForm(forms.Form):
+    number = forms.IntegerField(label='', widget=forms.NumberInput(attrs={'placeholder': 'Введите регистрационный номер'}))

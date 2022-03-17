@@ -19,14 +19,15 @@
 {% block header %}
 <header class="p-0 bg-dark text-white">
     <div class="d-flex bd-highlight">
-        <div class="p-2 flex-grow-1 bd-highlight"><h3>{% if user.is_authenticated  %}Hello, {{ user.get_username }}!{% endif %}</h3></div>
+        <div class="p-2 flex-grow-1 bd-highlight"><h3>{% if user.is_authenticated %}Hello, {{ user.get_username }}!
+            {% endif %}</h3></div>
         <div class="p-2 bd-highlight">
         </div>
         <div class="p-2 bd-highlight">
             <div class="dropdown text-end">
                 <a href="#" class="d-block link-light text-decoration-none dropdown-toggle" id="dropdownUser1"
                    data-bs-toggle="dropdown" aria-expanded="false">
-                    {% if user.is_authenticated  %}
+                    {% if user.is_authenticated %}
                     <img src="https://github.com/mdo.png" alt="mdo" width="42" height="42" class="rounded-circle">
                     {% endif %}
                 </a>
@@ -126,9 +127,9 @@
         </nav>
 
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 bg-dark.bg-gradient">
-            <div  class="min-vh-100">
+            <div class="min-vh-100">
                 {% block body %}
-            {% endblock %}
+                {% endblock %}
             </div>
         </main>
     </div>

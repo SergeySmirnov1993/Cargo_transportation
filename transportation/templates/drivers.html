@@ -2,43 +2,46 @@
 {% load crispy_forms_tags %}
 
 {% block title %}Drivers{% endblock %}
+
 {% block body %}
 
 <div class="d-flex flex-column align-items-stretch flex-shrink-0 bg-white">
     <div class="d-flex align-items-center flex-shrink-0 p-3 text-decoration-none border-bottom">
-      <svg class="bi me-2" width="30" height="24"><use xlink:href="#bootstrap"></use></svg>
-      <span class="fs-5 fw-semibold"><strong class="mb-1">Список водителей:</strong></span>
+        <svg class="bi me-2" width="30" height="24">
+            <use xlink:href="#bootstrap"></use>
+        </svg>
+        <span class="fs-5 fw-semibold"><strong class="mb-1">Список водителей:</strong></span>
     </div>
     <div class="list-group list-group-flush border-bottom scrollarea">
-      {% for driver in drivers %}
-      <a href="{% url 'edit-driver' driver_id=driver.id %}" class="list-group-item list-group-item-action py-3 lh-tight" aria-current="true">
-        <div class="d-flex w-100 align-items-center justify-content-between">
-          <strong class="mb-1">{{driver.name}} {{driver.surname}} {{driver.patronymic}}</strong>
-          <small>Мобильный телефон: +375{{driver.phone_num}}</small>
-        </div>
-        <div class="d-flex w-100 align-items-center justify-content-between">
-            {{driver.birth_date}}г.р. <br> Адрес: {{driver.address}}
-        </div>
-        <div class="col-10 mb-1 small">
-          Закрепленные ТС:<br>
-            {% for truck in driver.transport.all%}
-            - {{truck.brand}} {{truck.model}} {{truck.reg_number}}<br>
-            {% endfor%}
+        {% for driver in drivers %}
+        <a href="{% url 'edit-driver' driver_id=driver.id %}"
+           class="list-group-item list-group-item-action py-3 lh-tight" aria-current="true">
+            <div class="d-flex w-100 align-items-center justify-content-between">
+                <strong class="mb-1">{{driver.name}} {{driver.surname}} {{driver.patronymic}}</strong>
+                <small>Мобильный телефон: +375{{driver.phone_num}}</small>
+            </div>
+            <div class="d-flex w-100 align-items-center justify-content-between">
+                {{driver.birth_date}}г.р. <br> Адрес: {{driver.address}}
+            </div>
+            <div class="col-10 mb-1 small">
+                Закрепленные ТС:<br>
+                {% for truck in driver.transport.all%}
+                - {{truck.brand}} {{truck.model}} {{truck.reg_number}}<br>
+                {% endfor%}
 
-        </div>
-      </a>
-      {% endfor %}
+            </div>
+        </a>
+        {% endfor %}
     </div>
-  </div>
-
-<div class="row justify-content-md-center">
-  <div class="container text-center">
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#AddDriver"
-                data-bs-whatever="@mdo">Добавить водителя
-    </button>
-  </div>
 </div>
-
+<br>
+<div class="row justify-content-md-center">
+    <div class="container text-center">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#AddDriver"
+                data-bs-whatever="@mdo">Добавить водителя
+        </button>
+    </div>
+</div>
 <div class="modal fade" id="AddDriver" tabindex="-1" aria-labelledby="DriverLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -49,7 +52,7 @@
             <div class="modal-body">
                 <form method="post">
                     {% csrf_token %}
-                   {{ form|crispy }}
+                    {{ form|crispy }}
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Вернуться</button>
                         <button type="submit" class="btn btn-primary">Добавить</button>
@@ -59,6 +62,5 @@
         </div>
     </div>
 </div>
-
 
 {% endblock %}

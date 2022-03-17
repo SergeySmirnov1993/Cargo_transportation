@@ -1,18 +1,24 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
 
+{% block title %}Add transport{% endblock %}
+
 {% block body %}
 
 <main class="container container-small w-50 h-50">
     <div class="container-sm text-center">
         <form method="POST">
-            <h1 class="h3 mb-3 fw-normal">{% if action %}Редактировать информацию о транспортном средстве: {% else %} Добавить транспортное средство: {% endif %}</h1>
+            <h1 class="h3 mb-3 fw-normal">{% if action %}Редактировать информацию о транспортном средстве: {% else %}
+                Добавить транспортное средство: {% endif %}</h1>
             {% csrf_token %}
             {{ form|crispy }}
-            <button class="btn btn-primary mr-1" type="submit">{% if action %}Редактировать{% else %}Добавить{% endif %}</button>
+            <br>
+            <button class="btn btn-primary mr-1" type="submit">{% if action %}Редактировать{% else %}Добавить
+                {% endif %}
+            </button>
             <a class="btn btn-secondary" href="{% url 'transport' %}">Вернуться</a>
             {% if action %}
-            <a class="btn btn-danger" href="{% url 'delete-truck' truck_id=truck_id %}">Удалить транспортное средство</a>
+            <a class="btn btn-danger" href="{% url 'delete-truck' truck_id=truck_id %}">Удалить ТС</a>
             {% endif %}
         </form>
     </div>

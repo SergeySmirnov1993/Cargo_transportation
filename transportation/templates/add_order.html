@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
 
+{% block title %}Orders{% endblock %}
+
 {% block body %}
 
 <main class="container container-small w-50 h-50">
@@ -13,7 +15,7 @@
             {{ form|crispy }}
 
 
-
+            <br>
             <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
                 <button type="submit" class="btn btn-primary">{% if action %}Сохранить{% else %}Добавить{% endif %}</button>
                 <a type="button" class="btn btn-secondary" href="{% url 'orders' %}">Вернуться</a>
@@ -32,6 +34,8 @@
                 </div>
                 {% endif %}
             </div>
+            <br>
+            <br>
 
         </form>
     </div>
