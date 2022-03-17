@@ -1,9 +1,10 @@
 {%extends 'base.html'%}
 
 {% block title %}Charts{% endblock %}
+
 {% block links %}
 <script src="https://www.google.com/jsapi"></script>
-  <script>
+<script>
    google.load("visualization", "1", {packages:["corechart"]});
    google.setOnLoadCallback(drawChart);
    function drawChart() {
@@ -16,8 +17,8 @@
     var chart = new google.visualization.PieChart(document.getElementById('dir'));
      chart.draw(data, options);
    }
-  </script>
 
+</script>
 <script>
    google.load("visualization", "1", {packages:["corechart"]});
    google.setOnLoadCallback(drawChart);
@@ -31,8 +32,8 @@
     var chart = new google.visualization.ColumnChart(document.getElementById('num'));
     chart.draw(data, options);
    }
- </script>
 
+</script>
 <script>
    google.load("visualization", "1", {packages:["corechart"]});
    google.setOnLoadCallback(drawChart);
@@ -46,11 +47,12 @@
     var chart = new google.visualization.ColumnChart(document.getElementById('rub'));
     chart.draw(data, options);
    }
- </script>
+
+</script>
 {% endblock %}
 
 {% block body %}
-  <div id="dir" style="height: 600px;"></div>
-  <div id="num" style="height: 600px;"></div>
-  <div id="rub" style="height: 600px;"></div>
+<div id="dir" style="height: 600px;"></div>
+<div id="num" style="height: 600px;"></div>
+<div id="rub" style="height: 600px;"></div>
 {% endblock %}
