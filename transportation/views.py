@@ -82,7 +82,7 @@ def edit_driver(request, driver_id):
         form.fields['transport'].initial = driver.transport.all()
 
         context = {'form': form}
-        return render(request, 'drivers.html', context)
+        return render(request, 'edit_drivers.html', context)
 
     elif request.method == 'POST':
         updated_driver = functions.get_order(driver_id)
