@@ -18,6 +18,7 @@ NB_API = 'https://www.nbrb.by/api/exrates/rates?periodicity=0'
 KM_PRICE = 30
 locale.setlocale(locale.LC_ALL, "")
 
+
 def get_order(order_id):
     return models.Order.objects.get(id=order_id)
 
@@ -43,7 +44,7 @@ def get_truck(truck_id):
     return models.Transport.objects.get(id=truck_id)
 
 
-def get_truck_by_numbers(reg_numbers):
+def get_trucks_by_numbers(reg_numbers):
     return models.Transport.objects.filter(reg_number__in=reg_numbers)
 
 
@@ -51,15 +52,18 @@ def get_all_trucks():
     return models.Transport.objects.order_by('id').all()
 
 
+def get_all_drivers():
+    return models.Driver.objects.order_by('id').all()
+
+
+def get_driver(driver_id):
+    return models.Driver.objects.get(id=driver_id)
+
+
 def get_free_trucks():
-    exclude_vals = get_busy_reg_num()
+    busy_trucks = get_busy_trucks()
+    exclude_vals = set(truck.reg_number for truck in busy_trucks)
     trucks = models.Transport.objects.exclude(reg_number__in=exclude_vals)
-    return trucks
-
-
-def get_busy_trucks():
-    reg_nums = get_busy_reg_num()
-    trucks = models.Transport.objects.filter(reg_number__in=reg_nums)
     return trucks
 
 
@@ -71,17 +75,18 @@ def get_all_reg_num():
     return all_rn
 
 
-def get_busy_reg_num():
+def get_busy_trucks():
     orders = get_not_completed_orders()
-    busy_rn = set()
+    busy_trucks = set()
     for order in orders:
-        if order.transport != '':
-            busy_rn.add(order.transport)
-    return busy_rn
+        if order.transport:
+            busy_trucks.add(order.transport)
+    return busy_trucks
 
 
 def get_reg_num_choices():
-    busy_trucks_rn = get_busy_reg_num()
+    busy_trucks = get_busy_trucks()
+    busy_trucks_rn = set(truck.reg_number for truck in busy_trucks)
     all_trucks_rn = get_all_reg_num()
     free_trucks_rn = all_trucks_rn - busy_trucks_rn
     all_trucks_rn.add('')
@@ -90,6 +95,29 @@ def get_reg_num_choices():
     all_rn_choices = tuple((i, i) for i in all_trucks_rn)
     data = {'free_rn_choices': free_rn_choices, 'all_rn_choices': all_rn_choices}
     return data
+
+
+def get_drivers_choices():
+    drivers = models.Driver.objects.order_by('id').all()
+    drivers_names = set(f'{driver.name} {driver.surname}' for driver in drivers)
+    drivers_names.add('')
+    choices = tuple((name, name) for name in drivers_names)
+    return choices
+
+
+def get_trailer_choices():
+    trailers = models.TruckTrailer.objects.filter(transport=None)
+    choices = tuple((trailer.reg_number, trailer.reg_number) for trailer in trailers)
+    return choices + (('', ''), )
+
+
+def get_trailer_by_number(number):
+    return models.TruckTrailer.objects.filter(reg_number=number).first()
+
+
+def get_driver_by_name(name, surname):
+    driver = models.Driver.objects.filter(Q(name=name) & Q(surname=surname)).first()
+    return driver
 
 
 def convert_time(sec):
@@ -148,8 +176,6 @@ def exchange_rate():
     return new_data
 
 
-
-
 def orders_calculations(first_location, second_location):
     first_points = get_coordinates(first_location)
     second_points = get_coordinates(second_location)
@@ -166,12 +192,10 @@ def get_truck_for_additional_order(order_id):
     if same_dir_orders:
         same_dir_rn = {}
         for order in same_dir_orders:
-            if order.transport in same_dir_rn:
-                same_dir_rn[order.transport] += order.weight
-            else:
-                same_dir_rn[order.transport] = order.weight
+            if order.transport:
+                same_dir_rn[order.transport.reg_number] = order.weight
 
-        trucks = get_truck_by_numbers(same_dir_rn.keys())
+        trucks = get_trucks_by_numbers(same_dir_rn.keys())
         reg_num = {}
 
         for truck in trucks:

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block body %}
+
+<main class="container container-small w-50 h-50">
+    <div class="container-sm text-center">
+        <form method="POST">
+            <h1 class="h3 mb-3 fw-normal">Редактировать информацию о водителе:</h1>
+
+            {% csrf_token %}
+            {{ form|crispy }}
+
+            <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
+                <button type="submit" class="btn btn-primary">{% if action %}Сохранить{% else %}Добавить{% endif %}</button>
+                <a type="button" class="btn btn-secondary" href="{% url 'drivers' %}">Вернуться</a>
+                <a type="button" class="btn btn-secondary" href="{% url 'drivers' %}">Удалить</a>
+            </div>
+
+        </form>
+    </div>
+</main>
+
+{% endblock %}
